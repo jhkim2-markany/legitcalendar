@@ -14,6 +14,10 @@ moment_timezone.tz.setDefault("Asia/Seoul");
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 
 // -------------------------------------------------
+
+
+
+
 function Event({ event }) {
   return (
     <span>
@@ -40,17 +44,20 @@ function App() {
   const [dayLayoutAlgorithm, setdayLayoutAlgorithm] = useState("no-overlap");
 
   useEffect(() => {
-    axios.post("/api/getEvent").then((response) => {
+    axios.get("/api/getEvent").then((response) => {
+      console.log(response);
       console.log(response.data.event);
       let arr = response.data.event.map((ele) => {
         //map 쓰는법
         let { _id, start, end, desc, title } = ele;
+        console.log(ele._id)
         return { _id, title, desc, start: new Date(start), end: new Date(end) };
       });
       console.log(arr);
       setEvents(arr);
-    });
-  }, []);
+    })
+  }, [Events]);
+
 
   function handleSelect({ start, end }) {
     const title = window.prompt("일정을 추가하세요");
@@ -67,25 +74,36 @@ function App() {
   }
 
   function moveEvent({ event, start, end }) {
-    const nextEvents = Events.map((existingEvent) => {
-      // console.log("existingEvent" +existingEvent);
-      return existingEvent._id === event._id
-        ? { ...existingEvent, start, end }
-        : existingEvent;
-    });
-    // console.log("newEvnet " + nextEvents)
-    setEvents(nextEvents);
-    // axios.post("/api/moveEvent", Events).then(() => {});
-  }
+    console.log(event._id);
+    axios.post("/api/moveEvent", { _id: event._id, start, end }).then((response)=>{
+      console.log(response.data.event)
+  
+      let newEvents = Events.map((ele)=>{
+        console.log(`기존꺼 : ${ele._id} / 바꾼거 : ${response.data.event._id}`);
+        return (ele._id===response.data.event._id) ? response.data.event : ele
+      })
+      console.log(Events)
+      console.log(newEvents);
+      setEvents(newEvents)
+    })
+}
 
   function resizeEvent({ event, start, end }) {
-    const nextEvents = Events.map((existingEvent) => {
-      return existingEvent._id === event._id
-        ? { ...existingEvent, start, end }
-        : existingEvent;
-    });
-    setEvents(nextEvents);
-  }
+    console.log(event._id);
+    axios.post("/api/resizeEvent", { _id: event._id, start, end }).then((response)=>{
+      console.log(response.data.event)
+
+      let newEvents = Events.map((ele)=>{
+        console.log(`기존꺼 : ${ele._id} / 바꾼거 : ${response.data.event._id}`);
+        return (ele._id===response.data.event._id) ? response.data.event : ele
+      })
+      console.log(Events)
+      console.log(newEvents);
+      setEvents(newEvents)
+    })
+}
+
+
 
   function onSelectEvent(pEvent) {
     const r = window.confirm("일정을 취소합니다.");

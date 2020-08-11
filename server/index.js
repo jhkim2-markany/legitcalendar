@@ -41,7 +41,7 @@ app.get('/api', (req, res)=>{ // '/' 위치에 'get'요청을 받는 경우,
 
 
 //{}로 다 긁어온다.
-app.post("/api/getEvent", (req, res)=>{
+app.get("/api/getEvent", (req, res)=>{
     Event.find({},(err, db)=>{
       if(err) return res.json({success: false, err})
       return res.status(200).json({
@@ -54,15 +54,15 @@ app.post("/api/getEvent", (req, res)=>{
 
 //클라이언트에서 받아서 db로 넣는거
 app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
-  let { title, end, start, desc, _id } = req.body;
-  let query = { title, end, start, desc, _id }; //_id만 있어도 됨 일단 가지고 있자
-  console.log(query._id);  //아이디가 없으면 undefined가 뜬다.
-  if (query._id === undefined) {
-    query._id = new mongoose.Types.ObjectId();  //undefined이면 오브젝트 아이디를 만드러줌
+  let { title, end, start, desc, _id } = req.body; 
+  console.log(_id);  //아이디가 없으면 undefined가 뜬다.
+  if (_id === undefined) {
+    _id = new mongoose.Types.ObjectId();  //undefined이면 오브젝트 아이디를 만드러줌
   } // _id가 없으면 만들어준다
-  console.log("modified : " + query._id);
+  console.log("modified : " + _id);
   Event.findOneAndUpdate(
-    { _id: query._id }, // 검색조건
+    { _id: _id }, // 검색조건
+    //title : req.body.title
     { title: title, start: start, end: end, desc: desc}, //바꾸는 값들
     { upsert: true }, // 데이터가 없으면 새로만든다
     (err, eventInfo) => {
@@ -76,20 +76,49 @@ app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
 
 
 
+// app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
+//   let { title, end, start, desc, _id } = req.body; 
+//   Event.findOneAndUpdate(
+//     { _id: _id }, // 검색조건
+//     { title: title, start: start, end: end, desc: desc}, //바꾸는 값들
+//     (err, eventInfo) => {
+//       if (err) return res.json({ success: false, err });
+//       return res.status(200).json({
+//         success: true,
+
+//       });
+//     }
+//   );
+// });
+
+
+
+
 app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
-  let { title, end, start, desc, _id } = req.body;
-  let query = { title, end, start, desc, _id }; 
-  console.log(req.body)
-  Event.findOneAndUpdate(
-    { _id: query._id }, // 검색조건
-    {start: start, end: end}, //바꾸는 값들
-    (err, eventInfo) => {
-      if (err) return res.json({ success: false, err });
-      return res.status(200).json({
-        success: true,
-      });
-    }
-  );
+  let { _id, start, end } = req.body; // 배열
+  console.log( _id, start, end);
+  Event.findOneAndUpdate({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
+    console.log(eventInfo);
+    if(err) return res.json({ success: false, err });
+    return res.status(200).json({
+      success: true,
+      event : eventInfo
+    });
+  })
+});
+
+
+app.post("/api/resizeEvent", (req, res) => { //err,obj 잘 모르겠다
+  let { _id, start, end } = req.body; // 배열
+  console.log( _id, start, end);                //new를 쓰는 이유는??
+  Event.findOneAndUpdate({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
+    console.log(eventInfo);
+    if(err) return res.json({ success: false, err });
+    return res.status(200).json({
+      success: true,
+      event : eventInfo
+    });
+  })
 });
 
 
