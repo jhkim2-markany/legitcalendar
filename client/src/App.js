@@ -45,16 +45,18 @@ function App() {
 
   useEffect(() => {
     axios.get("/api/getEvent").then((response) => {
-      console.log(response);
-      console.log(response.data.event);
+      // console.log(response);
+      // console.log(response.data.event);
       let arr = response.data.event.map((ele) => {
         //map 쓰는법
         let { _id, start, end, desc, title } = ele;
-        console.log(ele._id)
+        // console.log(ele._id)
         return { _id, title, desc, start: new Date(start), end: new Date(end) };
       });
-      console.log(arr);
+      // console.log(arr);
       setEvents(arr);
+
+      
     })
   }, [Events]);
 
@@ -91,14 +93,14 @@ function App() {
   function resizeEvent({ event, start, end }) {
     console.log(event._id);
     axios.post("/api/resizeEvent", { _id: event._id, start, end }).then((response)=>{
-      console.log(response.data.event)
+      // console.log(response.data.event)
 
       let newEvents = Events.map((ele)=>{
         console.log(`기존꺼 : ${ele._id} / 바꾼거 : ${response.data.event._id}`);
         return (ele._id===response.data.event._id) ? response.data.event : ele
       })
-      console.log(Events)
-      console.log(newEvents);
+      // console.log(Events)
+      // console.log(newEvents);
       setEvents(newEvents)
     })
 }
@@ -106,8 +108,10 @@ function App() {
 
 
   function onSelectEvent(pEvent) {
+    console.log(pEvent)
     const r = window.confirm("일정을 취소합니다.");
     if (r === true) {
+      
       setEvents((preEvents) => {
         const events = [...preEvents];
         const idx = events.indexOf(pEvent);

@@ -122,6 +122,25 @@ app.post("/api/resizeEvent", (req, res) => { //err,obj 잘 모르겠다
 });
 
 
+app.delete("/api/removeEvent", (req, res) => { //err,obj 잘 모르겠다
+  let { _id, start, end } = req.body; // 배열
+  console.log( _id, start, end);                //new를 쓰는 이유는??
+  Event.findByIdAndDelete({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
+    console.log(eventInfo);
+    if(err) return res.json({ success: false, err });
+    return res.status(200).json({
+      success: true,
+      event : eventInfo
+    });
+  })
+});
+
+
+
+
+
+
+
 app.listen(port, ()=>{  // port변수를 이용하여 3000번 포트에 node.js 서버를 연결합니다.
   console.log(`server on! http://localhost:${port}`); //서버가 실행되면 콘솔창에 표시될 메세지입니다.
 });

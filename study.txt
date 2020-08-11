@@ -1,6 +1,8 @@
 https://demun.github.io/vscode-tutorial/shortcuts/ 단축키 설명
 환경설정
 
+//함수는 호출하는것에 따라서 인수전잘이 다르다.
+
 { "emmet.includeLanguages": { "javascript": "javascriptreact" } }
 
 ctrl+, 해서 설정 들어가서
