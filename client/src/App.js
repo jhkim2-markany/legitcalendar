@@ -37,10 +37,10 @@ function EventAgenda({ event }) {
 }
 
 //allday 이거 지웠고,
-function App() {
+function App(props) {
+
   //clonedeep 사실 필요없음, 게다가 useEffect에서 db에서 데이터 받을꺼라서 없어도됨
   const [Events, setEvents] = useState([]);
-  // const [Events, setEvents] = useState(events);
   const [dayLayoutAlgorithm, setdayLayoutAlgorithm] = useState("no-overlap");
 
   useEffect(() => {
@@ -54,9 +54,9 @@ function App() {
         return { _id, title, desc, start: new Date(start), end: new Date(end) };
       });
       // console.log(arr);
-      setEvents(arr);
-
-      
+      setEvents(arr);  
+      // console.log(momentLocalizer)
+      // console.log(localizer)
     })
   }, [Events]);
 
@@ -75,16 +75,19 @@ function App() {
     }
   }
 
+
   function moveEvent({ event, start, end }) {
+    console.log('이벤트: ',event)
     console.log(event._id);
     axios.post("/api/moveEvent", { _id: event._id, start, end }).then((response)=>{
-      console.log(response.data.event)
+      console.log("리스폰스 데이타",response.data.event)
   
       let newEvents = Events.map((ele)=>{
-        console.log(`기존꺼 : ${ele._id} / 바꾼거 : ${response.data.event._id}`);
+        console.log(`기존꺼 : ${ele._id} ${ele.start} / 바꾼거 : ${response.data.event._id}`);
         return (ele._id===response.data.event._id) ? response.data.event : ele
       })
       console.log(Events)
+
       console.log(newEvents);
       setEvents(newEvents)
     })
@@ -96,7 +99,7 @@ function App() {
       // console.log(response.data.event)
 
       let newEvents = Events.map((ele)=>{
-        console.log(`기존꺼 : ${ele._id} / 바꾼거 : ${response.data.event._id}`);
+        console.log(`기존꺼 : ${ele._id} ${ele.start} / 바꾼거 : ${response.data.event._id}`);
         return (ele._id===response.data.event._id) ? response.data.event : ele
       })
       // console.log(Events)

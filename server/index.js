@@ -110,7 +110,8 @@ app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
 
 app.post("/api/resizeEvent", (req, res) => { //err,obj 잘 모르겠다
   let { _id, start, end } = req.body; // 배열
-  console.log( _id, start, end);                //new를 쓰는 이유는??
+  console.log( _id, start, end);               //https://www.zerocho.com/category/MongoDB/post/579e2821c097d015000404dc
+                                               //new를 쓰는 이유는?? 수정 이후의 다큐먼트를 반환할 지 결정하는 부분입니다. { new: true }를 넣으면 수정 이후의 다큐먼트를 반환합니다. 
   Event.findOneAndUpdate({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
     console.log(eventInfo);
     if(err) return res.json({ success: false, err });
@@ -122,18 +123,21 @@ app.post("/api/resizeEvent", (req, res) => { //err,obj 잘 모르겠다
 });
 
 
-app.delete("/api/removeEvent", (req, res) => { //err,obj 잘 모르겠다
-  let { _id, start, end } = req.body; // 배열
-  console.log( _id, start, end);                //new를 쓰는 이유는??
-  Event.findByIdAndDelete({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
-    console.log(eventInfo);
-    if(err) return res.json({ success: false, err });
-    return res.status(200).json({
-      success: true,
-      event : eventInfo
-    });
-  })
-});
+
+
+
+// app.delete("/api/removeEvent", (req, res) => { //err,obj 잘 모르겠다
+//   let { _id, start, end } = req.body; // 배열
+//   console.log( _id, start, end);                //new를 쓰는 이유는??
+//   Event.findByIdAndDelete({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
+//     console.log(eventInfo);
+//     if(err) return res.json({ success: false, err });
+//     return res.status(200).json({
+//       success: true,
+//       event : eventInfo
+//     });
+//   })
+// });
 
 
 
