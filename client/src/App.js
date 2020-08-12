@@ -54,10 +54,10 @@ function App() {
         // console.log(ele._id)
         return { _id, title, desc, start: new Date(start), end: new Date(end) };
       });
-      // console.log(arr);
+      console.log(arr);
       setEvents(arr);  
     })
-  }, [Events]);
+  }, []);
 
 
   function handleSelect({ start, end }) {
@@ -69,39 +69,35 @@ function App() {
         ...events, //전개를 해줘야 여러개 setEvents를 설정가능
         newEvent,
       ]);
-      console.log("newEvnet " + newEvent)   //object object
+      console.log("newEvnet " + newEvent)  
       axios.post("/api/event", newEvent).then(() => {});
     }
   }
 
 
   function moveEvent({ event, start, end }) {
-    // console.log('이벤트: ',event)
-    // console.log(event._id);
-    axios.post("/api/moveEvent", { _id: event._id, start, end }).then((response)=>{
-      // console.log("리스폰스 데이타",response.data.event)
-  
-      let newEvents = Events.map((ele)=>{
-        // console.log(`기존꺼 : ${ele._id} ${ele.start} / 바꾼거 : ${response.data.event._id}`);
-        return (ele._id===response.data.event._id) ? response.data.event : ele
-      })
-      // console.log(Events)
-      // console.log(newEvents);
-      setEvents(newEvents)
-    })
-}
+    axios
+      .post("/api/moveEvent", { _id: event._id, start, end })
+      .then((response) => {
+        let newEvents = Events.map((ele) => {
+          return ele._id === response.data.event._id
+            ? response.data.event
+            : ele;
+        });
+        setEvents(newEvents);
+      });
+  }
 
-  function resizeEvent({ event, start, end }) {
+  function resizeEvent({ event, start, end, _id }) {
     // console.log(event._id);
     axios.post("/api/resizeEvent", { _id: event._id, start, end }).then((response)=>{
       // console.log(response.data.event)
-
       let newEvents = Events.map((ele)=>{
         // console.log(`기존꺼 : ${ele._id} ${ele.start} / 바꾼거 : ${response.data.event._id} ${response.data.event.start}`);
         return (ele._id===response.data.event._id) ? response.data.event : ele
       })
       // console.log(Events)
-      // console.log(newEvents);
+      console.log(newEvents); //retrun date 객체로 받아야할꺼 같은데?
       setEvents(newEvents)
       console.log(Events)
     })
@@ -115,6 +111,22 @@ function App() {
       axios.post("/api/removeEvent",pEvent).then(()=>{})
     }
   }
+
+
+  // //개꼼수로 한거
+  function onDragStart(){
+    axios.get("/api/getEvent").then((response) => {
+      let arr = response.data.event.map((ele) => {
+        let { _id, start, end, desc, title } = ele;
+        return { _id, title, desc, start: new Date(start), end: new Date(end) };
+      });
+      console.log(arr);
+      setEvents(arr);  
+    })
+  }
+
+  
+
 
 
   const localizer = momentLocalizer(moment_timezone);
@@ -135,7 +147,7 @@ function App() {
         defaultDate={moment_timezone().toDate()} //디폴트 날짜
         onSelectSlot={handleSelect} //**날짜 선택시 콜백이 발생한다 -> 위에서 만들어준 handleSelect가 실행
         dayLayoutAlgorithm={dayLayoutAlgorithm} //레이아웃 배열의 알고리즘
-        onDragStart={console.log} //콘솔로그 찍히는거 드래그 시작할 떄
+        onDragStart={onDragStart} // 드래그 시작할 떄 => 클릭시
         onEventDrop={moveEvent}
         onEventResize={resizeEvent}
         onDoubleClickEvent={(event) => onSelectEvent(event)}
