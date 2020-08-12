@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 // import events from "./events";
 // import _ from "lodash";
+// import moment from 'moment'
 import axios from "axios";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment_timezone from "moment-timezone";
@@ -37,10 +38,10 @@ function EventAgenda({ event }) {
 }
 
 //allday 이거 지웠고,
-function App(props) {
-
+function App() {
   //clonedeep 사실 필요없음, 게다가 useEffect에서 db에서 데이터 받을꺼라서 없어도됨
   const [Events, setEvents] = useState([]);
+  // const [Events, setEvents] = useState(events);
   const [dayLayoutAlgorithm, setdayLayoutAlgorithm] = useState("no-overlap");
 
   useEffect(() => {
@@ -55,8 +56,6 @@ function App(props) {
       });
       // console.log(arr);
       setEvents(arr);  
-      // console.log(momentLocalizer)
-      // console.log(localizer)
     })
   }, [Events]);
 
@@ -77,29 +76,13 @@ function App(props) {
 
 
   function moveEvent({ event, start, end }) {
-    console.log('이벤트: ',event)
-    console.log(event._id);
+    // console.log('이벤트: ',event)
+    // console.log(event._id);
     axios.post("/api/moveEvent", { _id: event._id, start, end }).then((response)=>{
-      console.log("리스폰스 데이타",response.data.event)
+      // console.log("리스폰스 데이타",response.data.event)
   
       let newEvents = Events.map((ele)=>{
-        console.log(`기존꺼 : ${ele._id} ${ele.start} / 바꾼거 : ${response.data.event._id}`);
-        return (ele._id===response.data.event._id) ? response.data.event : ele
-      })
-      console.log(Events)
-
-      console.log(newEvents);
-      setEvents(newEvents)
-    })
-}
-
-  function resizeEvent({ event, start, end }) {
-    console.log(event._id);
-    axios.post("/api/resizeEvent", { _id: event._id, start, end }).then((response)=>{
-      // console.log(response.data.event)
-
-      let newEvents = Events.map((ele)=>{
-        console.log(`기존꺼 : ${ele._id} ${ele.start} / 바꾼거 : ${response.data.event._id}`);
+        // console.log(`기존꺼 : ${ele._id} ${ele.start} / 바꾼거 : ${response.data.event._id}`);
         return (ele._id===response.data.event._id) ? response.data.event : ele
       })
       // console.log(Events)
@@ -108,21 +91,31 @@ function App(props) {
     })
 }
 
+  function resizeEvent({ event, start, end }) {
+    // console.log(event._id);
+    axios.post("/api/resizeEvent", { _id: event._id, start, end }).then((response)=>{
+      // console.log(response.data.event)
 
+      let newEvents = Events.map((ele)=>{
+        // console.log(`기존꺼 : ${ele._id} ${ele.start} / 바꾼거 : ${response.data.event._id} ${response.data.event.start}`);
+        return (ele._id===response.data.event._id) ? response.data.event : ele
+      })
+      // console.log(Events)
+      // console.log(newEvents);
+      setEvents(newEvents)
+      console.log(Events)
+    })
+}
 
   function onSelectEvent(pEvent) {
     console.log(pEvent)
     const r = window.confirm("일정을 취소합니다.");
     if (r === true) {
-      
-      setEvents((preEvents) => {
-        const events = [...preEvents];
-        const idx = events.indexOf(pEvent);
-        events.splice(idx, 1);
-        return events;
-      });
+      console.log(pEvent)
+      axios.post("/api/removeEvent",pEvent).then(()=>{})
     }
   }
+
 
   const localizer = momentLocalizer(moment_timezone);
   return (
@@ -134,6 +127,7 @@ function App(props) {
         selectable={true} //필수 ** 날짜와 범위를 선택할수 있게 만들어줌
         localizer={localizer} //moment 모듈을 이용한 로컬화
         events={Events} //이벤트 나오게 하는거
+        allDayAccessor="allday"
         startAccessor="start"
         endAccessor="end"
         defaultView={Views.MONTH} //디폴트 뷰
