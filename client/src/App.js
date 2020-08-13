@@ -44,20 +44,39 @@ function App() {
   // const [Events, setEvents] = useState(events);
   const [dayLayoutAlgorithm, setdayLayoutAlgorithm] = useState("no-overlap");
 
+
   useEffect(() => {
     axios.get("/api/getEvent").then((response) => {
       // console.log(response);
       // console.log(response.data.event);
       let arr = response.data.event.map((ele) => {
         //map 쓰는법
-        let { _id, start, end, desc, title } = ele;
+        let { _id, start, end, desc, title, index } = ele;
         // console.log(ele._id)
-        return { _id, title, desc, start: new Date(start), end: new Date(end) };
+        return { _id, title, desc, start: new Date(start), end: new Date(end), index};
       });
-      console.log(arr);
+      // console.log(arr);
       setEvents(arr);  
     })
   }, []);
+
+
+  // function handleSelect({ start, end }) {
+  //   const title = window.prompt("일정을 추가하세요");
+  //   const desc = window.prompt("내용을 추가하세요");
+  //   if (title) {
+  //     let newEvent = { title, start, end, desc };
+  //     axios.post("/api/event", newEvent)
+  //     .then((response) => console.log(response.data));
+  //     setEvents((events) => [
+  //       ...events, //전개를 해줘야 여러개 setEvents를 설정가능
+  //       newEvent,
+  //     ]);
+  //     console.log("newEvnet " + newEvent, newEvent._id)  
+
+  //   }
+  //   console.log("이벤트",Events)
+  // }
 
 
   function handleSelect({ start, end }) {
@@ -65,68 +84,72 @@ function App() {
     const desc = window.prompt("내용을 추가하세요");
     if (title) {
       let newEvent = { title, start, end, desc };
-      setEvents((events) => [
-        ...events, //전개를 해줘야 여러개 setEvents를 설정가능
-        newEvent,
-      ]);
-      console.log("newEvnet " + newEvent)  
-      axios.post("/api/event", newEvent).then(() => {});
+      axios.post("/api/event", newEvent)
+      console.log("만들어진",newEvent)
     }
-  }
-
-
-  function moveEvent({ event, start, end }) {
-    axios
-      .post("/api/moveEvent", { _id: event._id, start, end })
-      .then((response) => {
-        let newEvents = Events.map((ele) => {
-          return ele._id === response.data.event._id
-            ? response.data.event
-            : ele;
-        });
-        setEvents(newEvents);
+    axios.get("/api/getEvent").then((response) => {
+      let arr = response.data.event.map((ele) => {
+        let { _id, start, end, desc, title, index } = ele;
+        return { _id, title, desc, start: new Date(start), end: new Date(end), index};
       });
+      setEvents(arr);
+      console.log(arr); 
+    })
   }
 
-  function resizeEvent({ event, start, end, _id }) {
-    // console.log(event._id);
-    axios.post("/api/resizeEvent", { _id: event._id, start, end }).then((response)=>{
-      // console.log(response.data.event)
-      let newEvents = Events.map((ele)=>{
-        // console.log(`기존꺼 : ${ele._id} ${ele.start} / 바꾼거 : ${response.data.event._id} ${response.data.event.start}`);
-        return (ele._id===response.data.event._id) ? response.data.event : ele
+//처음 새로고침 했을떄 한번만 바로 적용이 안디ㅗ고 나머지는 적용이 가능
+
+  function moveEvent({ event, start, end, title }) {
+    console.log(event) //하나만 받아옴 하나만 받아온걸 데이터베이스에 보내고
+                          //서버에서 변경된값을 데이터베이스에서 수정하고
+                          // 그 결과값을 다시 받아와서 전체 데이터 배열을 map  
+    axios
+      .post("/api/moveEvent", { _id: event._id, start, end, title})
+    
+    axios
+      .get("/api/getEvent").then((response) => {
+          let arr = response.data.event.map((ele) => {
+            let { _id, start, end, desc, title, index } = ele;
+            return { _id, title, desc, start: new Date(start), end: new Date(end), index};
+          });
+          setEvents(arr);
+          console.log(arr); 
+        })
+      };
+
+
+  function resizeEvent({ event, start, end }) {
+    console.log(event._id);
+    axios.post("/api/resizeEvent", { _id: event._id, start, end })
+    axios
+    .get("/api/getEvent").then((response) => {
+        let arr = response.data.event.map((ele) => {
+          let { _id, start, end, desc, title, index } = ele;
+          return { _id, title, desc, start: new Date(start), end: new Date(end), index};
+        });
+        setEvents(arr);
+        console.log(arr); 
       })
-      // console.log(Events)
-      console.log(newEvents); //retrun date 객체로 받아야할꺼 같은데?
-      setEvents(newEvents)
-      console.log(Events)
-    })
-}
+  }
+
 
   function onSelectEvent(pEvent) {
     console.log(pEvent)
     const r = window.confirm("일정을 취소합니다.");
     if (r === true) {
       console.log(pEvent)
-      axios.post("/api/removeEvent",pEvent).then(()=>{})
+      axios.post("/api/removeEvent",pEvent)
     }
+    axios
+    .get("/api/getEvent").then((response) => {
+        let arr = response.data.event.map((ele) => {
+          let { _id, start, end, desc, title, index } = ele;
+          return { _id, title, desc, start: new Date(start), end: new Date(end), index};
+        });
+        setEvents(arr);
+        console.log(arr); 
+      })
   }
-
-
-  // //개꼼수로 한거
-  function onDragStart(){
-    axios.get("/api/getEvent").then((response) => {
-      let arr = response.data.event.map((ele) => {
-        let { _id, start, end, desc, title } = ele;
-        return { _id, title, desc, start: new Date(start), end: new Date(end) };
-      });
-      console.log(arr);
-      setEvents(arr);  
-    })
-  }
-
-  
-
 
 
   const localizer = momentLocalizer(moment_timezone);
@@ -147,10 +170,10 @@ function App() {
         defaultDate={moment_timezone().toDate()} //디폴트 날짜
         onSelectSlot={handleSelect} //**날짜 선택시 콜백이 발생한다 -> 위에서 만들어준 handleSelect가 실행
         dayLayoutAlgorithm={dayLayoutAlgorithm} //레이아웃 배열의 알고리즘
-        onDragStart={onDragStart} // 드래그 시작할 떄 => 클릭시
+        onDragStart={console.log} // 드래그 시작할 떄 => 클릭시
         onEventDrop={moveEvent}
         onEventResize={resizeEvent}
-        onDoubleClickEvent={(event) => onSelectEvent(event)}
+        onDoubleClickEvent={onSelectEvent}
         components={{
           event: Event, //여기서 호버줘야함
           agenda: {

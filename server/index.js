@@ -31,18 +31,22 @@ mongoose.connect('mongodb+srv://JWTEX:TIGER@jwt-rkkz2.mongodb.net/<dbname>?retry
 
 
 
-
-app.get('/api', (req, res)=>{ // '/' 위치에 'get'요청을 받는 경우,
-  res.send('Hello World!'); // "Hello World!"를 보냅니다.
-  });
-  
-
-
-
-
+    // app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
+    //   let { _id, start, end} = req.body; // 배열
+    //   console.log( _id, start, end);
+    //   Event.findOneAndUpdate({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
+    //     console.log(eventInfo);
+    //     if(err) return res.json({ success: false, err });
+    //     return res.status(200).json({
+    //       success: true,
+    //       event : eventInfo
+    //     });
+    //   })
+    // });
 //{}로 다 긁어온다.
 app.get("/api/getEvent", (req, res)=>{
-    Event.find({},(err, db)=>{
+    Event.find({}, (err, db)=>{
+      console.log(db)
       if(err) return res.json({success: false, err})
       return res.status(200).json({
         success : true,
@@ -74,6 +78,37 @@ app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
   );
 });
 
+//-- 인덱스로 바보처럼 만든거
+// app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
+//   console.log(req.body.index)
+//   let { title, end, start, desc, _id , index} = req.body; 
+//   console.log(_id);  //아이디가 없으면 undefined가 뜬다.
+//   if (_id === undefined) {
+//     _id = new mongoose.Types.ObjectId();  //undefined이면 오브젝트 아이디를 만드러줌
+//   } // _id가 없으면 만들어준다
+//   console.log("modified : " + _id);
+//   console.log(index)
+//   Event.findOneAndUpdate(
+//     { _id: _id }, // 검색조건
+//     //title : req.body.title
+//     { title: title, start: start, end: end, desc: desc, index: index}, //바꾸는 값들
+//     { upsert: true }, // 데이터가 없으면 새로만든다
+//     (err, eventInfo) => {
+//       console.log("70",index)
+//       if (err) return res.json({ success: false, err });
+//       return res.status(200).json({
+//         success: true,
+//         event: {title, start, end , desc, index}
+//       });
+//     }
+//   );
+// });
+
+
+
+
+
+
 
 
 // app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
@@ -92,10 +127,8 @@ app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
 // });
 
 
-
-
 app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
-  let { _id, start, end } = req.body; // 배열
+  let { _id, start, end} = req.body; // 배열
   console.log( _id, start, end);
   Event.findOneAndUpdate({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
     console.log(eventInfo);
@@ -126,7 +159,7 @@ app.post("/api/resizeEvent", (req, res) => { //err,obj 잘 모르겠다
 
 app.post("/api/removeEvent", (req,rse)=>{
   let { _id } = req.body; // 오브젝트로 묶어줘야한다.
-  console.log(req.body)   //req.body._id는 안됨
+  console.log(req.body)   //{req.body._id}는 안됨
   Event.deleteOne({_id}, function(err,result){
     if(err){
       console.log("err",err)
