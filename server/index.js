@@ -31,18 +31,7 @@ mongoose.connect('mongodb+srv://JWTEX:TIGER@jwt-rkkz2.mongodb.net/<dbname>?retry
 
 
 
-    // app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
-    //   let { _id, start, end} = req.body; // 배열
-    //   console.log( _id, start, end);
-    //   Event.findOneAndUpdate({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
-    //     console.log(eventInfo);
-    //     if(err) return res.json({ success: false, err });
-    //     return res.status(200).json({
-    //       success: true,
-    //       event : eventInfo
-    //     });
-    //   })
-    // });
+
 //{}로 다 긁어온다.
 app.get("/api/getEvent", (req, res)=>{
     Event.find({}, (err, db)=>{
