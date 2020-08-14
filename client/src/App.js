@@ -154,9 +154,7 @@ function App() {
     if (r === true) {
       console.log(pEvent)
       axios.post("/api/removeEvent",pEvent)
-    }
-    axios
-    .get("/api/getEvent").then((response) => {
+      .then((response) => {
         let arr = response.data.event.map((ele) => {
           let { _id, start, end, desc, title, index } = ele;
           return { _id, title, desc, start: new Date(start), end: new Date(end), index};
@@ -164,7 +162,8 @@ function App() {
         setEvents(arr);
         console.log(arr); 
       })
-  }
+    }}
+
 
 
   const localizer = momentLocalizer(moment_timezone);

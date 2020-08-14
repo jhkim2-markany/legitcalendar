@@ -140,7 +140,7 @@ app.post("/api/resizeEvent", (req, res) => {
 //   });
 // });
 
-app.post("/api/removeEvent", (req,rse)=>{
+app.post("/api/removeEvent", (req,res)=>{
     let { _id } = req.body; // 오브젝트로 묶어줘야한다.
     console.log(req.body)   //{req.body._id}는 안됨
     Event.deleteOne({_id})
