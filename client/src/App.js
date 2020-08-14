@@ -73,10 +73,27 @@ function App() {
   //       newEvent,
   //     ]);
   //     console.log("newEvnet " + newEvent, newEvent._id)  
-
   //   }
   //   console.log("이벤트",Events)
   // }
+
+  // function handleSelect({ start, end }) {
+  //   const title = window.prompt("일정을 추가하세요");
+  //   const desc = window.prompt("내용을 추가하세요");
+  //   if (title) {
+  //     let newEvent = { title, start, end, desc };
+  //     axios.post("/api/event", newEvent)
+  //     console.log("만들어진",newEvent)
+  //   }
+  //   axios.get("/api/getEvent").then((response) => {
+  //     let arr = response.data.event.map((ele) => {
+  //       let { _id, start, end, desc, title, index } = ele;
+  //       return { _id, title, desc, start: new Date(start), end: new Date(end), index};
+  //     });
+  //     setEvents(arr);
+  //     console.log(arr); 
+  //   })
+  // }      //비동기식이기 때문에 순서대로 실행되는게 아니여서 가끔 실행이 바로바로 갱신이 안되었던것
 
 
   function handleSelect({ start, end }) {
@@ -85,27 +102,26 @@ function App() {
     if (title) {
       let newEvent = { title, start, end, desc };
       axios.post("/api/event", newEvent)
+      .then((response) => {
+        let arr = response.data.event.map((ele) => {
+          let { _id, start, end, desc, title, index } = ele;
+          return { _id, title, desc, start: new Date(start), end: new Date(end), index};
+        });
+        setEvents(arr);
+        console.log(arr); 
+      })
       console.log("만들어진",newEvent)
     }
-    axios.get("/api/getEvent").then((response) => {
-      let arr = response.data.event.map((ele) => {
-        let { _id, start, end, desc, title, index } = ele;
-        return { _id, title, desc, start: new Date(start), end: new Date(end), index};
-      });
-      setEvents(arr);
-      console.log(arr); 
-    })
   }
 
-//처음 새로고침 했을떄 한번만 바로 적용이 안디ㅗ고 나머지는 적용이 가능
+
 
   function moveEvent({ event, start, end, title }) {
     console.log(event) //하나만 받아옴 하나만 받아온걸 데이터베이스에 보내고
                           //서버에서 변경된값을 데이터베이스에서 수정하고
                           // 그 결과값을 다시 받아와서 전체 데이터 배열을 map  
     axios
-      .post("/api/moveEvent", { _id: event._id, start, end, title})
-    
+      .post("/api/moveEvent", { _id: event._id, start, end, title}) 
     axios
       .get("/api/getEvent").then((response) => {
           let arr = response.data.event.map((ele) => {

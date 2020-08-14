@@ -30,19 +30,23 @@ mongoose.connect('mongodb+srv://JWTEX:TIGER@jwt-rkkz2.mongodb.net/<dbname>?retry
     .catch((err) => console.log(err));
 
 
+    // 아래에다가 씀
+    // function getEventList(res) {
+    //   Event.find({}).exec()
+    //   .then((db)=>{
+    //     return res.status(200).json({
+    //       success : true,
+    //       event: db //event라는 이름으로 db 내용을 가져온다.
+    //     })
+    //   })
+    //    .catch((err)=>{
+    //      return res.json({ success: false, err });
+    //   // })
+    // }
 
-
-//{}로 다 긁어온다.
 app.get("/api/getEvent", (req, res)=>{
-    Event.find({}, (err, db)=>{
-      console.log(db)
-      if(err) return res.json({success: false, err})
-      return res.status(200).json({
-        success : true,
-        event: db //event라는 이름으로 db 내용을 가져온다.
-      })
-    })
-  })
+  getEventList(res)
+})
 
 
 //클라이언트에서 받아서 db로 넣는거
@@ -55,49 +59,16 @@ app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
   console.log("modified : " + _id);
   Event.findOneAndUpdate(
     { _id: _id }, // 검색조건
-    //title : req.body.title
     { title: title, start: start, end: end, desc: desc}, //바꾸는 값들
-    { upsert: true }, // 데이터가 없으면 새로만든다
-    (err, eventInfo) => {
-      if (err) return res.json({ success: false, err });
-      return res.status(200).json({
-        success: true,
-      });
-    }
-  );
+    { upsert: true })// 데이터가 없으면 새로만든다
+    .exec()   //exec를 통해서 실행시켜준다 => 비동기를 동기식으로 처리한다. 
+    .then((eventInfo) => {        // => 비동기식이였기 때문에 순서의 상관없어서 데이터가 바로 넣어질때랑 딜레이가 잇었을떄가 있었음
+      getEventList(res);
+    })
+    // .catch((err)=>{           //에러를 잡는데 위에 함수에서 대신 해줌
+    //   return res.json({ success: false, err });
+    // })
 });
-
-//-- 인덱스로 바보처럼 만든거
-// app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
-//   console.log(req.body.index)
-//   let { title, end, start, desc, _id , index} = req.body; 
-//   console.log(_id);  //아이디가 없으면 undefined가 뜬다.
-//   if (_id === undefined) {
-//     _id = new mongoose.Types.ObjectId();  //undefined이면 오브젝트 아이디를 만드러줌
-//   } // _id가 없으면 만들어준다
-//   console.log("modified : " + _id);
-//   console.log(index)
-//   Event.findOneAndUpdate(
-//     { _id: _id }, // 검색조건
-//     //title : req.body.title
-//     { title: title, start: start, end: end, desc: desc, index: index}, //바꾸는 값들
-//     { upsert: true }, // 데이터가 없으면 새로만든다
-//     (err, eventInfo) => {
-//       console.log("70",index)
-//       if (err) return res.json({ success: false, err });
-//       return res.status(200).json({
-//         success: true,
-//         event: {title, start, end , desc, index}
-//       });
-//     }
-//   );
-// });
-
-
-
-
-
-
 
 
 // app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
@@ -109,7 +80,6 @@ app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
 //       if (err) return res.json({ success: false, err });
 //       return res.status(200).json({
 //         success: true,
-
 //       });
 //     }
 //   );
@@ -159,8 +129,20 @@ app.post("/api/removeEvent", (req,rse)=>{
 });
 
 
-
-
 app.listen(port, ()=>{  // port변수를 이용하여 3000번 포트에 node.js 서버를 연결합니다.
   console.log(`server on! http://localhost:${port}`); //서버가 실행되면 콘솔창에 표시될 메세지입니다.
 });
+
+function getEventList(res) {
+  Event.find({}).exec()
+  .then((db)=>{
+    // console.log(db)
+    return res.status(200).json({
+      success : true,
+      event: db //event라는 이름으로 db 내용을 가져온다.
+    })
+  })
+  .catch((err)=>{
+    return res.json({ success: false, err });
+  })
+}
