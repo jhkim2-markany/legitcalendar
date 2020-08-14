@@ -115,7 +115,6 @@ function App() {
   }
 
 
-
   function moveEvent({ event, start, end, title }) {
     console.log(event) //하나만 받아옴 하나만 받아온걸 데이터베이스에 보내고
                           //서버에서 변경된값을 데이터베이스에서 수정하고
@@ -147,7 +146,6 @@ function App() {
   }
 
 
-
   function onSelectEvent(pEvent) {
     console.log(pEvent)
     const r = window.confirm("일정을 취소합니다.");
@@ -163,6 +161,7 @@ function App() {
         console.log(arr); 
       })
     }}
+
 
 
 

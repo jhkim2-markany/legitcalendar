@@ -50,7 +50,7 @@ app.get("/api/getEvent", (req, res)=>{
 
 
 //클라이언트에서 받아서 db로 넣는거
-app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
+app.post("/api/event", (req, res) => {
   let { title, end, start, desc, _id } = req.body; 
   console.log(_id);  //아이디가 없으면 undefined가 뜬다.
   if (_id === undefined) {
@@ -71,7 +71,7 @@ app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
 });
 
 
-// app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
+// app.post("/api/moveEvent", (req, res) => {
 //   let { title, end, start, desc, _id } = req.body; 
 //   Event.findOneAndUpdate(
 //     { _id: _id }, // 검색조건
@@ -86,8 +86,8 @@ app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
 // });
 
 
-// app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
-//   let { _id, start, end} = req.body; // 배열
+// app.post("/api/moveEvent", (req, res) => {
+//   let { _id, start, end} = req.body; // 객체
 //   console.log( _id, start, end);
 //   Event.findOneAndUpdate({ _id}, {start, end}, { new :true })
 //   .exec((err, eventInfo)=>{
@@ -102,8 +102,7 @@ app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
 
 
 app.post("/api/moveEvent", (req, res) => {
-  //err,obj 잘 모르겠다
-  let { _id, start, end } = req.body; // 배열
+  let { _id, start, end } = req.body; // 객체 // 오브젝트로 묶어줘야한다.
   console.log(_id, start, end);
   Event.findOneAndUpdate({ _id }, { start, end }, { new: true })
     .exec() //exec를 통해서 실행시켜준다 => 비동기를 동기식으로 처리한다.
@@ -115,9 +114,8 @@ app.post("/api/moveEvent", (req, res) => {
 
 
 app.post("/api/resizeEvent", (req, res) => {
-  //err,obj 잘 모르겠다
   console.log(req.body);
-  let { _id, start, end } = req.body; // 오브젝트
+  let { _id, start, end } = req.body; // 오브젝트 // 오브젝트로 묶어줘야한다.
   console.log(_id, start, end);                       //https://www.zerocho.com/category/MongoDB/post/579e2821c097d015000404dc
                                                     //new를 쓰는 이유는?? 수정 이후의 다큐먼트를 반환할 지 결정하는 부분입니다. { new: true }를 넣으면 수정 이후의 다큐먼트를 반환합니다.
   Event.findOneAndUpdate({ _id }, { start, end }, { new: true })
