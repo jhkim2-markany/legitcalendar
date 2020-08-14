@@ -86,46 +86,68 @@ app.post("/api/event", (req, res) => { //err,obj 잘 모르겠다
 // });
 
 
-app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
-  let { _id, start, end} = req.body; // 배열
-  console.log( _id, start, end);
-  Event.findOneAndUpdate({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
-    console.log(eventInfo);
-    if(err) return res.json({ success: false, err });
-    return res.status(200).json({
-      success: true,
-      event : eventInfo
+// app.post("/api/moveEvent", (req, res) => { //err,obj 잘 모르겠다
+//   let { _id, start, end} = req.body; // 배열
+//   console.log( _id, start, end);
+//   Event.findOneAndUpdate({ _id}, {start, end}, { new :true })
+//   .exec((err, eventInfo)=>{
+//     console.log(eventInfo);
+//     if(err) return res.json({ success: false, err });
+//     return res.status(200).json({
+//       success: true,
+//       event : eventInfo
+//     });
+//   })
+// });
+
+
+app.post("/api/moveEvent", (req, res) => {
+  //err,obj 잘 모르겠다
+  let { _id, start, end } = req.body; // 배열
+  console.log(_id, start, end);
+  Event.findOneAndUpdate({ _id }, { start, end }, { new: true })
+    .exec() //exec를 통해서 실행시켜준다 => 비동기를 동기식으로 처리한다.
+    .then(() => {
+      // => 비동기식이였기 때문에 순서의 상관없어서 데이터가 바로 넣어질때랑 딜레이가 잇었을떄가 있었음
+      getEventList(res);
     });
-  })
 });
 
 
-app.post("/api/resizeEvent", (req, res) => { //err,obj 잘 모르겠다
-  console.log(req.body)
+app.post("/api/resizeEvent", (req, res) => {
+  //err,obj 잘 모르겠다
+  console.log(req.body);
   let { _id, start, end } = req.body; // 오브젝트
-  console.log( _id, start, end);               //https://www.zerocho.com/category/MongoDB/post/579e2821c097d015000404dc
-                                               //new를 쓰는 이유는?? 수정 이후의 다큐먼트를 반환할 지 결정하는 부분입니다. { new: true }를 넣으면 수정 이후의 다큐먼트를 반환합니다. 
-  Event.findOneAndUpdate({ _id}, {start, end}, { new :true }).exec((err, eventInfo)=>{
-    console.log(eventInfo);
-    if(err) return res.json({ success: false, err });
-    return res.status(200).json({
-      success: true,
-      event : eventInfo
+  console.log(_id, start, end);                       //https://www.zerocho.com/category/MongoDB/post/579e2821c097d015000404dc
+                                                    //new를 쓰는 이유는?? 수정 이후의 다큐먼트를 반환할 지 결정하는 부분입니다. { new: true }를 넣으면 수정 이후의 다큐먼트를 반환합니다.
+  Event.findOneAndUpdate({ _id }, { start, end }, { new: true })
+    .exec()           //exec를 통해서 실행시켜준다 => 비동기를 동기식으로 처리한다.
+    .then(() => {     // => 비동기식이였기 때문에 순서의 상관없어서 데이터가 바로 넣어질때랑 딜레이가 잇었을떄가 있었음
+      getEventList(res);
     });
-  })
 });
 
+
+// app.post("/api/removeEvent", (req,rse)=>{
+//   let { _id } = req.body; // 오브젝트로 묶어줘야한다.
+//   console.log(req.body)   //{req.body._id}는 안됨
+//   Event.deleteOne({_id}, function(err,result){
+//     if(err){
+//       console.log("err",err)
+//     } else {
+//       console.log("result",result)
+//     }
+//   });
+// });
 
 app.post("/api/removeEvent", (req,rse)=>{
-  let { _id } = req.body; // 오브젝트로 묶어줘야한다.
-  console.log(req.body)   //{req.body._id}는 안됨
-  Event.deleteOne({_id}, function(err,result){
-    if(err){
-      console.log("err",err)
-    } else {
-      console.log("result",result)
-    }
-  });
+    let { _id } = req.body; // 오브젝트로 묶어줘야한다.
+    console.log(req.body)   //{req.body._id}는 안됨
+    Event.deleteOne({_id})
+    .exec()           //exec를 통해서 실행시켜준다 => 비동기를 동기식으로 처리한다.
+    .then(() => {     // => 비동기식이였기 때문에 순서의 상관없어서 데이터가 바로 넣어질때랑 딜레이가 잇었을떄가 있었음
+      getEventList(res);
+    });
 });
 
 

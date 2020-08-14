@@ -122,23 +122,7 @@ function App() {
                           // 그 결과값을 다시 받아와서 전체 데이터 배열을 map  
     axios
       .post("/api/moveEvent", { _id: event._id, start, end, title}) 
-    axios
-      .get("/api/getEvent").then((response) => {
-          let arr = response.data.event.map((ele) => {
-            let { _id, start, end, desc, title, index } = ele;
-            return { _id, title, desc, start: new Date(start), end: new Date(end), index};
-          });
-          setEvents(arr);
-          console.log(arr); 
-        })
-      };
-
-
-  function resizeEvent({ event, start, end }) {
-    console.log(event._id);
-    axios.post("/api/resizeEvent", { _id: event._id, start, end })
-    axios
-    .get("/api/getEvent").then((response) => {
+      .then((response) => {
         let arr = response.data.event.map((ele) => {
           let { _id, start, end, desc, title, index } = ele;
           return { _id, title, desc, start: new Date(start), end: new Date(end), index};
@@ -146,9 +130,24 @@ function App() {
         setEvents(arr);
         console.log(arr); 
       })
+    }
+
+
+  function resizeEvent({ event, start, end }) {
+    console.log(event._id);
+    axios.post("/api/resizeEvent", { _id: event._id, start, end })
+    .then((response) => {
+      let arr = response.data.event.map((ele) => {
+        let { _id, start, end, desc, title, index } = ele;
+        return { _id, title, desc, start: new Date(start), end: new Date(end), index};
+      });
+      setEvents(arr);
+      console.log(arr); 
+    })
   }
 
-  
+
+
   function onSelectEvent(pEvent) {
     console.log(pEvent)
     const r = window.confirm("일정을 취소합니다.");
